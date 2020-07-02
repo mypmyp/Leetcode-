@@ -1,0 +1,43 @@
+19. 删除链表的倒数第N个节点
+给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。
+
+示例：
+
+给定一个链表: 1->2->3->4->5, 和 n = 2.
+
+当删除了倒数第二个节点后，链表变为 1->2->3->5.
+
+思路：要讨论删除节点的位置，1：头结点2：尾节点3：中间节点
+
+class Solution {
+public:
+	ListNode* removeNthFromEnd(ListNode* head, int n) {
+    // 默认至少两个节点
+		if (head == NULL || head->next == NULL){
+			return NULL;
+		}
+		ListNode *dummy = head;
+		int size = 1;
+		while (dummy->next) {
+			++size;
+			dummy = dummy->next;
+		}
+		dummy = head;
+    // 找到待删除节点的前驱节点
+		for (int i = 1; i < size - n; i++)
+			dummy = dummy->next;
+    // 判断待删除节点位置
+		if (n == size) {
+			return head->next;
+		}
+    
+		if (n == 1) {
+			dummy->next = NULL;
+		}
+		else {
+			dummy->next = dummy->next->next;
+		}
+
+		return head;
+	}
+};
