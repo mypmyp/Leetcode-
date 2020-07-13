@@ -1,0 +1,69 @@
+862. 和至少为 K 的最短子数组
+返回 A 的最短的非空连续子数组的长度，该子数组的和至少为 K 。
+
+如果没有和至少为 K 的非空子数组，返回 -1 。
+
+ 
+
+示例 1：
+
+输入：A = [1], K = 1
+输出：1
+示例 2：
+
+输入：A = [1,2], K = 4
+输出：-1
+示例 3：
+
+输入：A = [2,-1,2], K = 3
+输出：3
+ 
+
+提示：
+
+1 <= A.length <= 50000
+-10 ^ 5 <= A[i] <= 10 ^ 5
+1 <= K <= 10 ^ 9
+
+
+思路：这是一道hard题，首先想到的是双指针，但是数组元素有负数用不了；
+      看答案总结了如下方法：1：将此问题转化为前缀和，假设有这样的数组，A = [10, -5, 15,], K = 10，对应累积和为[0, 10, 5, 20]，人为加0，是为了和前n项和对应；
+                          2：这里才使用了双端队列，因为排到我们时，我们要从后面剔除高个，再从前面第一位开始进行比较，另一种解释：包含负数区间的求和去掉，因为负数后面的数肯定也符合条件>=K,而且长度也比较小
+                          3：题目很难，多总结
+                          
+                          
+代码：
+class Solution {
+public:
+	int shortestSubarray(vector<int>& A, int K) {
+		if (A.empty()) {
+			return -1;
+		}
+		vector<int> prefixSum;
+		int sum = 0;
+		// 人为加0，和前n项和对应
+		prefixSum.push_back(sum);
+		for (auto a : A) {
+			sum += a;
+			prefixSum.push_back(sum);
+		}
+		// 这里才使用了双端队列，因为排到我们时，我们要从后面剔除高个，再从前面第一位开始进行比较
+		deque<int> dq;
+		int minValue = A.size() + 1;
+		for (int i = 0; i < prefixSum.size(); i++) {
+			// increasing deque
+
+			// 包含负数区间的求和去掉，因为负数后面的数肯定也符合条件>=K,而且长度也比较小
+			while (!dq.empty() && prefixSum.at(dq.back()) >= prefixSum.at(i)) {
+				dq.pop_back();
+			}
+
+			while (!dq.empty() && (prefixSum.at(i) - prefixSum.at(dq.front())) >= K) {
+				minValue = min(minValue, i - dq.front());
+				dq.pop_front();
+			}
+			dq.push_front(i);
+		}
+		return minValue >= (A.size() + 1) ? -1 : minValue;
+	}
+};
